@@ -7,9 +7,9 @@ const stageLabels: Record<ExperimentEvent['stage'], string> = {
   approval: '审批', handoff: '交接', grounding: '依据', result: '结论', error: '异常',
 }
 
-export function EventCard({ event, showMeta = false }: { event: ExperimentEvent; showMeta?: boolean }) {
+export function EventCard({ event, showMeta = false, approvalStatus, interactive = false }: { event: ExperimentEvent; showMeta?: boolean; approvalStatus?: string; interactive?: boolean }) {
   return (
-    <article className={`event-card event-${event.stage}`}>
+    <article className={`event-card event-${event.stage}`} id={showMeta ? undefined : `event-${event.id}`} tabIndex={-1}>
       <div className="event-card-head">
         <span className="event-stage">{stageLabels[event.stage]}</span>
         {showMeta ? <span className={`side-chip side-${event.side}`}>{event.side.toUpperCase()}</span> : null}
@@ -23,6 +23,8 @@ export function EventCard({ event, showMeta = false }: { event: ExperimentEvent;
           approvalId={event.evidence.approvalId}
           action={event.evidence.action ?? event.summary}
           scope={event.evidence.scope ?? '受控工作区'}
+          status={approvalStatus ?? event.evidence.approvalStatus ?? event.status}
+          interactive={interactive && !showMeta}
         />
       ) : null}
       <EvidenceDrawer evidence={event.evidence} />

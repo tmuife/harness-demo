@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { submitApproval } from '../api/experimentApi'
+import { ApiError, submitApproval } from '../api/experimentApi'
 
-export function ApprovalCard({ approvalId, action, scope }: { approvalId: string; action: string; scope: string }) {
-  const [decision, setDecision] = useState<'approved' | 'rejected' | null>(null)
+export function ApprovalCard({ approvalId, action, scope, status = 'pending', interactive = true }: { approvalId: string; action: string; scope: string; status?: string; interactive?: boolean }) {
+  const [decision, setDecision] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const decide = async (approved: boolean) => {
@@ -12,12 +12,17 @@ export function ApprovalCard({ approvalId, action, scope }: { approvalId: string
       await submitApproval(approvalId, approved)
       setDecision(approved ? 'approved' : 'rejected')
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : '提交审批失败。')
+      if (reason instanceof ApiError && (reason.status === 409 || reason.status === 404)) {
+        setDecision(reason.status === 409 ? 'handled' : 'expired')
+      } else setError(reason instanceof Error ? reason.message : '提交审批失败。')
     } finally {
       setBusy(false)
     }
   }
-  if (decision) return <p className="approval-decision">审批{decision === 'approved' ? '已批准' : '已拒绝'}。</p>
+  const resolved = status !== 'pending' ? status : decision
+  const labels: Record<string, string> = { approved: '审批已批准。', rejected: '审批已拒绝。', timed_out: '审批等待超时，受保护动作已停止。', handled: '审批已处理，等待服务端记录同步。', expired: '审批已过期或不可用。' }
+  if (resolved) return <p className="approval-decision" role="status">{labels[resolved] ?? '审批已结束。'}</p>
+  if (!interactive) return <p className="approval-decision">审批请求（历史记录）</p>
   return (
     <div className="approval-card">
       <strong>等待人工审批</strong>

@@ -6,12 +6,21 @@ Harness Lab 提供六类可运行 Harness 能力：Understand、Act、Prove、Co
 
 模型完整输出、Diff 和测试日志默认收在类型化证据中。页面底部的“完整记录”区域用于排错，可按全部、PLAIN 或 HARNESS 筛选，不影响默认讲解流程。
 
-每项能力都有“查看任务”弹窗，说明共享业务目标、两侧条件、完成定义、证据和讲解提示。组件映射说明六个结果导向 Demo 与培训的 11 个 Harness 组件之间的主要/支撑关系；它不是一对一覆盖率，子 Agent 编排在本轮没有独立演示。Control 的审批仍以内联时间线卡片处理，任务弹窗不负责审批。
+首页以 11 个组件的教学架构图为入口。选择组件后，右侧直接展示职责、关联 Demo、任务目标、PLAIN/HARNESS 条件和观察重点；多个关联实验可以单选切换。点击组件不会启动模型调用，只有“开始对照”会创建真实实验。
+
+顶部“查看业务背景”解释共享运费场景，“查看完整任务”补充当前 Demo 的完成条件和讲解提示。Understand 是只读分析；Control 的受控停止与任务完成分开表达；Ground 的外部依据为本地模拟。组件与 Demo 是主要/支撑关系，子 Agent 编排目前仅提供职责说明。
+
+开始后页面进入实验工作台，保留任务入口和观察阶段定位。运行中锁定配置，Control 审批保持内联可操作；刷新会恢复最近实验和待审批状态。完成后可返回架构继续探索，最近结果始终标记原 Demo，不随新选择改变归属。完整记录中的审批只作为历史展示。
+
+窄屏使用分组组件列表，并提供“查看所选组件与任务”定位；节点、实验选择和详情支持键盘与减少动画。
+
+本阶段直接连接现有后端，不请求新的组件目录接口。`src/features/experiment/explorer.ts` 集中维护教学布局、组件职责和任务摘要回退，能力状态、关联关系与运行证据仍来自 API。后续后端收敛范围是组件说明/分组、业务背景和逐项任务目标/完成条件，需在前端评审后单独决定实施。
 
 详细页面与接口设计见：
 
-- [OpenSpec proposal](../openspec/changes/improve-comparison-readability/proposal.md)
-- [OpenSpec design](../openspec/changes/improve-comparison-readability/design.md)
+- [架构探索首页提案](../openspec/changes/add-harness-architecture-explorer/proposal.md)
+- [架构探索首页设计](../openspec/changes/add-harness-architecture-explorer/design.md)
+- [现有对照与接口设计](../openspec/changes/improve-comparison-readability/design.md)
 
 ## 本地开发
 

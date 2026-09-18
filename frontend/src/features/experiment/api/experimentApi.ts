@@ -8,11 +8,19 @@ import type {
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '/api'
 
+export class ApiError extends Error {
+  readonly status: number
+  constructor(message: string, status: number) {
+    super(message)
+    this.status = status
+  }
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE}${path}`, init)
   if (!response.ok) {
     const body = await response.json().catch(() => ({ detail: '服务请求失败。' }))
-    throw new Error(typeof body.detail === 'string' ? body.detail : '服务请求失败。')
+    throw new ApiError(typeof body?.detail === 'string' ? body.detail : '服务请求失败。', response.status)
   }
   if (response.status === 204) return undefined as T
   return response.json() as Promise<T>

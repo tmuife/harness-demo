@@ -32,7 +32,7 @@ export function PhaseComparison({ experiment }: { experiment: ExperimentResult }
       </div>
       <div className="phase-head" aria-hidden="true"><span>阶段</span><span>PLAIN</span><span>HARNESS</span></div>
       {phases.map((phase) => (
-        <article className="phase-row" key={phase}>
+        <article className="phase-row" key={phase} id={`phase-${phase}`} tabIndex={-1}>
           <header>
             <span>{phaseLabels[phase].index}</span>
             <div><strong>{phaseLabels[phase].title}</strong><small>{phaseLabels[phase].question}</small></div>

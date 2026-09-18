@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { experimentReducer, initialState } from './experimentReducer'
 import type { ExperimentEvent } from './types'
+import { capabilities, experiment, task } from '../../test/experimentFixtures'
 
 const event = (id: string, sequence: number): ExperimentEvent => ({
   id,
@@ -17,9 +18,21 @@ const event = (id: string, sequence: number): ExperimentEvent => ({
 
 describe('experimentReducer', () => {
   it('replaces the selected capability', () => {
-    const ready = { ...initialState, status: 'ready' as const }
+    const ready = { ...initialState, status: 'ready' as const, capabilities, task }
     const selected = experimentReducer(ready, { type: 'select', capabilityId: 'understand' })
     expect(experimentReducer(selected, { type: 'select', capabilityId: 'act' }).selectedCapabilityId).toBe('act')
+  })
+
+  it('rejects late running snapshots and foreign events after completion', () => {
+    const completed = experimentReducer({ ...initialState, capabilities }, { type: 'experiment-loaded', experiment: experiment() })
+    expect(experimentReducer(completed, { type: 'experiment-loaded', experiment: experiment('act', 'running') })).toBe(completed)
+    expect(experimentReducer(completed, { type: 'event', event: event('late', 99) })).toBe(completed)
+  })
+
+  it('merges a delayed snapshot without dropping newer streamed evidence', () => {
+    const current = { ...initialState, status: 'running' as const, experiment: { ...experiment('act', 'running'), events: [{ ...event('newer', 10), experimentId: 'exp_test' }] } }
+    const next = experimentReducer(current, { type: 'experiment-loaded', experiment: experiment('act', 'running') })
+    expect(next.experiment?.events[0].id).toBe('newer')
   })
 
   it('deduplicates and sorts streamed events', () => {

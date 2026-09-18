@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import type { Capability, TaskBrief } from '../types'
+import { businessBackground, taskPreview } from '../explorer'
 
 interface DemoTaskDialogProps {
   capability: Capability
@@ -10,9 +11,16 @@ interface DemoTaskDialogProps {
 export function DemoTaskDialog({ capability, task, onClose }: DemoTaskDialogProps) {
   const closeRef = useRef<HTMLButtonElement>(null)
   const dialogRef = useRef<HTMLDivElement>(null)
-  const detail = capability.demoTask
+  const preview = taskPreview(capability)
+  const detail = preview.detail
 
   useEffect(() => {
+    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null
+    const main = document.querySelector('main')
+    const wasInert = main?.inert ?? false
+    if (main) main.inert = true
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
     closeRef.current?.focus()
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose()
@@ -30,7 +38,12 @@ export function DemoTaskDialog({ capability, task, onClose }: DemoTaskDialogProp
       }
     }
     document.addEventListener('keydown', onKeyDown)
-    return () => document.removeEventListener('keydown', onKeyDown)
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+      if (main) main.inert = wasInert
+      document.body.style.overflow = previousOverflow
+      previousFocus?.focus()
+    }
   }, [onClose])
 
   return (
@@ -50,7 +63,8 @@ export function DemoTaskDialog({ capability, task, onClose }: DemoTaskDialogProp
         {detail ? (
           <div className="task-dialog-body">
             <p className="task-question">{detail.question}</p>
-            {task ? <p><b>共享业务任务：</b>{task.summary}</p> : null}
+            <p><b>任务目标：</b>{preview.objective}</p>
+            {task ? <p><b>共享业务任务：</b>{task.title} · {businessBackground.summary}</p> : null}
             <div className="task-conditions"><section><span>PLAIN</span><p>{detail.plainCondition}</p></section><section><span>HARNESS</span><p>{detail.harnessCondition}</p></section></div>
             <section><h3>完成定义</h3><ul>{detail.completionDefinition.map((item) => <li key={item}>{item}</li>)}</ul></section>
             <section><h3>本次观察证据</h3><ul>{detail.expectedEvidence.map((item) => <li key={item}>{item}</li>)}</ul></section>

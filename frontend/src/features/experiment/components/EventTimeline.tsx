@@ -6,7 +6,11 @@ export function EventTimeline({ events, waiting }: { events: ExperimentEvent[]; 
   if (events.length === 0) return <div className="timeline-empty">等待关键步骤</div>
   return (
     <ol className="timeline" aria-label="运行关键步骤">
-      {events.map((event) => <li key={event.id}><EventCard event={event} /></li>)}
+      {events.map((event) => {
+        const approvalId = event.evidence.approvalId
+        const latest = approvalId ? events.filter((item) => item.evidence.approvalId === approvalId).at(-1) : null
+        return <li key={event.id}><EventCard event={event} approvalStatus={latest?.evidence.approvalStatus ?? latest?.status} interactive={latest?.id === event.id} /></li>
+      })}
     </ol>
   )
 }
