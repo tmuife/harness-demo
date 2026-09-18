@@ -1,0 +1,34 @@
+[project]
+name = "harness-demo"
+version = "0.1.0"
+description = "Live LLM harness comparison demonstrations"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.141.1",
+    "openai>=1.0",
+    "python-dotenv>=1.0",
+    "uvicorn[standard]>=0.52.4",
+]
+
+[project.scripts]
+harness-demo = "harness_demo.__main__:main"
+harness-api = "harness_demo.web.app:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.8",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"

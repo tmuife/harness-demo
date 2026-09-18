@@ -1,0 +1,9 @@
+{
+  "source": "local-demo-provider",
+  "version": "2026-09",
+  "effective_date": "2026-09-01",
+  "domestic_base_fee_cents": 800,
+  "regular_free_shipping_threshold_cents": 5000,
+  "member_free_shipping_threshold_cents": 3000,
+  "international_flat_fee_cents": 2000
+}

@@ -1,0 +1,13 @@
+# Backend local configuration and generated files
+backend/.env
+backend/.demo-workspace/
+backend/.pytest_cache/
+backend/.ruff_cache/
+backend/.venv/
+backend/dist/
+backend/**/__pycache__/
+backend/**/*.py[cod]
+
+# Frontend dependencies and build output are also covered by frontend/.gitignore.
+frontend/node_modules/
+frontend/dist/
